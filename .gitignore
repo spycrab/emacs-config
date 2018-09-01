@@ -1,0 +1,26 @@
+# Ignore backup files
+*~
+
+# Ignore tramp
+tramp
+
+# Ignore projectile
+projectile-*
+
+# Ignore sessions
+session.*
+
+# Ignore org-mode stuff
+
+*.pdf
+*.tex
+settings.el
+_minted-settings/
+
+# Ignore various directories
+elpa/
+emojis/
+url/
+games/
+irony/
+auto_save-list/

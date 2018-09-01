@@ -1,0 +1,318 @@
+#+TITLE: My Emacs configuration
+
+# TODO: Maybe integrate this?
+
+* :truck: Load path
+  #+BEGIN_SRC emacs-lisp
+    (add-to-list 'load-path "~/.emacs.d/lisp/")
+  #+END_SRC
+* :gear: Custom Functions
+** Open settings   
+   #+BEGIN_SRC emacs-lisp
+   (defun settings ()
+     "Open settings.org"
+     (interactive)
+     (find-file "~/.emacs.d/settings.org"))
+   #+END_SRC
+** C-+: Insert TODO
+   #+BEGIN_SRC emacs-lisp
+   (defun create-todo-at-point()
+     "Create new TODO comment at point"
+     (interactive)
+     (previous-line)
+     (end-of-line)
+     (newline-and-indent)
+     (insert "TODO: ")
+     (comment-line nil)
+     (previous-line)
+     (end-of-line))
+
+   (global-set-key (kbd "C-+") 'create-todo-at-point)
+   #+END_SRC
+* :earth-americas: Global Keybindings
+  For local keybindings please see [[:speech-left: Languages / Modes]] and [[:package: Packages]].
+** "F8": eshell   
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "<f8>") 'eshell)
+   #+END_SRC
+** "C-c a": Show agenda
+    #+BEGIN_SRC emacs-lisp
+      (global-set-key (kbd "C-c a") 'org-agenda)
+    #+END_SRC
+** "C-c d": Dash at point
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-c d") 'helm-dash-at-point)
+   #+END_SRC
+* :package: Packages
+** MELPA
+   #+BEGIN_SRC emacs-lisp
+     (require 'package) ;; You might already have this line
+     (add-to-list 'package-archives
+                  '("melpa" . "https://melpa.org/packages/"))
+     (when (< emacs-major-version 24)
+       ;; For important compatibility libraries like cl-lib
+       (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+   #+END_SRC
+** use-package
+   #+BEGIN_SRC emacs-lisp
+     (unless (package-installed-p 'use-package) (package-refresh-contents) (package-install 'use-package t))
+   #+END_SRC
+** Helm
+   #+BEGIN_SRC emacs-lisp
+     (use-package helm :ensure t
+       :bind ("M-x" . helm-M-x)
+       :config (lambda() (require 'helm-files) (require 'helm-config)))
+   #+END_SRC
+*** helm-dash
+    #+BEGIN_SRC emacs-lisp
+      (use-package helm-dash :ensure t
+        :config (lambda()  (helm-dash-activate-docset "Qt") (add-to-list 'helm-dash-common-docsets "Qt")))
+    #+END_SRC
+** FlyCheck
+   #+BEGIN_SRC emacs-lisp
+     (use-package flycheck :ensure t)
+
+     (setq flycheck-gcc-args "-std=c++1z")
+     (setq flycheck-clang-args "-std=c++1z")
+   #+END_SRC
+** HTMLize
+    #+BEGIN_SRC emacs-lisp
+      (use-package htmlize :ensure t)
+    #+END_SRC
+** Auto Complete
+   #+BEGIN_SRC emacs-lisp
+;     (use-package auto-complete :ensure t
+;       :config (lambda() (ac-config-default) (ac-emacs-lisp-mode-setup) (auto-complete-mode)))
+   #+END_SRC
+*** Org Mode
+    #+BEGIN_SRC emacs-lisp
+;      (use-package org-ac :ensure t
+;        :config (org-ac/config-default))
+    #+END_SRC
+    #+END_SRC
+** :smirk: Irony
+  #+BEGIN_SRC elisp
+      (use-package irony :ensure t)
+  #+END_SRC
+** :office: Company
+   #+BEGIN_SRC emacs-lisp
+     (use-package company :ensure t)
+     (global-company-mode)
+   #+END_SRC
+*** Company Irony
+    #+BEGIN_SRC emacs-lisp
+      (use-package company-irony :ensure t)
+    #+END_SRC
+** :org: Org Mode
+*** Org ELPA
+    #+BEGIN_SRC emacs-lisp
+      (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+      (package-initialize)
+
+      (unless (package-installed-p 'org-plus-contrib) (package-install 'org-plus-contrib t))
+    #+END_SRC
+*** ox-twbs: Export to Twitter Bootstrap
+    #+BEGIN_SRC emacs-lisp
+      (use-package ox-twbs :ensure t)
+    #+END_SRC
+*** ox-reveal: Export to Reveal.js Presentation
+    #+BEGIN_SRC emacs-lisp
+      (use-package ox-reveal :ensure t
+        :config (setq org-reveal-root "./reveal.js"))
+    #+END_SRC
+*** org-bullets: Use pretty UTF-8 bullets
+    #+BEGIN_SRC emacs-lisp
+      (use-package org-bullets :ensure t
+                               :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+    #+END_SRC
+*** org-ref: Use BibTex
+    #+BEGIN_SRC emacs-lisp
+      (use-package org-ref :ensure t)
+    #+END_SRC
+** :pdf: PDF Mode
+   #+BEGIN_SRC emacs-lisp
+     (use-package pdf-tools :ensure t)
+     (defun force-pdf-tools () "Always switch to pdf-view-mode when viewing .pdf files"
+            (when (and (stringp buffer-file-name) (string-match "\\.pdf\\'" buffer-file-name)) (pdf-view-mode)))
+     (add-hook 'find-file-hook 'force-pdf-tools)
+   #+END_SRC
+** Powerline
+   #+BEGIN_SRC emacs-lisp
+     (use-package powerline :ensure t
+       :config (powerline-default-theme))
+   #+END_SRC
+** clang-format
+   #+BEGIN_SRC emacs-lisp
+     (use-package clang-format :ensure t
+       :config (add-hook 'c-mode-common-hook (lambda() (local-set-key (kbd "C-c i") 'clang-format-region)
+                                                                               (local-set-key (kbd "C-c u") 'clang-format-buffer))))
+   #+END_SRC
+** Icons
+*** All the icons
+    #+BEGIN_SRC emacs-lisp
+      (use-package all-the-icons :ensure t)
+    #+END_SRC
+*** Emojify
+    #+BEGIN_SRC emacs-lisp
+      (message "Emojify")
+      (use-package emojify :ensure t
+        :config (setq emojify-emoji-styles '(github unicode)))
+      (global-emojify-mode)
+    #+END_SRC
+**** emojify-logos
+     #+BEGIN_SRC emacs-lisp
+      (message "Emojify Logos")
+      (use-package emojify-logos :ensure t)
+     #+END_SRC
+** ECB
+   #+BEGIN_SRC emacs-lisp
+     (message "ECB")
+     (use-package ecb :ensure t)
+   #+END_SRC
+* :speech-left: Languages / Modes
+** 🕑 Display Time   
+   #+BEGIN_SRC emacs-lisp
+     (setq display-time-format "%D %H:%M:%S")
+     (setq display-time-interval 1)
+     (display-time-mode 1)
+   #+END_SRC
+** :c++: C(++)
+*** C-#: ff-find-other-file
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'c-mode-common-hook
+            (lambda() (local-set-key (kbd "C-#") 'ff-find-other-file)))
+#+END_SRC
+*** C-c C-a: Auto complete
+#+BEGIN_SRC emacs-lisp
+    (add-hook 'c-mode-common-hook
+              (lambda() 
+                (irony-mode) 
+                (local-set-key (kbd "C-c C-a") 'company-irony)))
+#+END_SRC
+*** Style: Linux
+    #+BEGIN_SRC emacs-lisp
+      (setq c-default-style "linux")
+    #+END_SRC
+*** Tab width
+    #+BEGIN_SRC emacs-lisp
+      (setq c-basic-offset 4)
+    #+END_SRC
+** :latex: Latex
+*** Compile document in background
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'latex-mode-hook
+                (lambda() (local-set-key (kbd "<f6>")
+                                         (lambda() (interactive)
+                                           (save-buffer)
+                                           (save-window-excursion
+                                             (shell-command 
+                                            (format "pdflatex %s" buffer-file-name)
+                                            (get-buffer-create "*PDFLaTeX Output*"))
+                                           )
+                                           ))))
+    #+END_SRC
+** :perl: Perl
+*** Default to cperl-mode
+    #+BEGIN_SRC emacs-lisp
+      (defalias 'perl-mode 'cperl-mode)
+    #+END_SRC
+*** Don't indent braces
+  #+BEGIN_SRC emacs-lisp
+    (setq cperl-brace-offset -2)
+  #+END_SRC
+*** Tab width
+    #+BEGIN_SRC emacs-lisp
+      (setq cperl-indent-level 4)
+    #+END_SRC
+*** Electric mode 
+    #+BEGIN_SRC emacs-lisp
+      (setq cperl-electric-parens t)
+    #+END_SRC
+*** Enable FlyCheck
+    #+BEGIN_SRC emacs-lisp
+    (add-hook 'cperl-mode-hook 'flycheck-mode)
+    #+END_SRC
+** :pdf: PDF
+*** Auto revert
+    #+BEGIN_SRC emacs-lisp
+      (setq auto-revert-interval 1)
+      (add-hook 'pdf-view-mode-hook
+                (lambda() (auto-revert-mode)))
+    #+END_SRC
+** :org: Org Mode
+*** Fontify source code
+    #+BEGIN_SRC emacs-lisp
+      (setq org-src-fontify-natively t)
+    #+END_SRC
+*** Indent source code natively
+    #+BEGIN_SRC emacs-lisp
+      (setq org-src-tab-acts-natively t)
+    #+END_SRC
+*** Highlight LaTeX
+    #+BEGIN_SRC emacs-lisp
+            (setq org-highlight-latex-and-related '(latex script entities))
+            (setq org-latex-listings t)
+            (add-to-list 'org-latex-packages-alist '("" "listings"))
+            (add-to-list 'org-latex-packages-alist '("" "color"))
+    #+END_SRC
+*** ox-latex: Syntax highlighting
+    #+BEGIN_SRC emacs-lisp
+      ;; Include the latex-exporter
+      (require 'ox-latex)
+      ;; Add minted to the defaults packages to include when exporting.
+      (add-to-list 'org-latex-packages-alist '("" "minted"))
+      ;; Tell the latex export to use the minted package for source
+      ;; code coloration.
+      (setq org-latex-listings 'minted)
+      ;; Let the exporter use the -shell-escape option to let latex
+      ;; execute external programs.
+      ;; This obviously and can be dangerous to activate!
+      (setq org-latex-pdf-process (list
+         "latexmk -pdflatex='pdflatex -shell-escape -interaction nonstopmode' -pdf -f  %f"))
+    #+END_SRC
+
+*** Add obsolete method redirect
+    #+BEGIN_SRC emacs-lisp
+      (define-obsolete-function-alias 'org-define-error 'define-error)
+    #+END_SRC
+
+*** Babel: Add gnuplot support
+    #+BEGIN_SRC emacs-lisp
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((gnuplot . t)))
+    #+END_SRC
+* :left-right-arrow: Tabs
+  For language specific tab widths, see [[:speech-left: Languages / Modes]].
+** Default width
+   #+BEGIN_SRC emacs-lisp
+     (setq tab-width 4)
+   #+END_SRC
+** Spaces
+   #+BEGIN_SRC emacs-lisp
+     (setq-default indent-tabs-mode nil)
+   #+END_SRC
+* :rocket: Emacsclient
+#+BEGIN_SRC emacs-lisp
+(server-start)
+#+END_SRC
+* :art: Theme
+** Theme: Solarized Dark
+  #+BEGIN_SRC emacs-lisp
+    (use-package solarized-theme :ensure t :config
+      (add-hook 'before-make-frame-hook (lambda() (load-theme 'solarized-dark t))))
+
+    (load-theme 'solarized-dark t)
+    (set-face-underline 'org-block-begin-line nil)
+    (set-face-attribute 'org-block-end-line nil :overline nil)
+    (set-face-attribute 'org-level-1 nil :height 175)
+  #+END_SRC
+** Hide menu and toolbar
+  #+BEGIN_SRC emacs-lisp
+    (menu-bar-mode 0)
+    (tool-bar-mode 0)
+  #+END_SRC
+* :stopwatch: Load Speed
+  #+BEGIN_SRC emacs-lisp
+    (message "Took %s" (emacs-uptime))
+  #+END_SRC

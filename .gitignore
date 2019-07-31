@@ -17,6 +17,10 @@ session.*
 settings.el
 _minted-settings/
 
+# Ignore customize stuff
+
+custom.el
+
 # Ignore various directories
 elpa/
 emojis/

@@ -6,6 +6,11 @@
   #+BEGIN_SRC emacs-lisp
     (add-to-list 'load-path "~/.emacs.d/lisp/")
   #+END_SRC
+** Make Emacs not mess up .emacs
+   #+BEGIN_SRC emacs-lisp
+   (setq custom-file "~/.emacs.d/custom.el")
+   (load-file "~/.emacs.d/custom.el")
+   #+END_SRC
 * :gear: Custom Functions
 ** Open settings   
    #+BEGIN_SRC emacs-lisp
@@ -44,10 +49,6 @@
      (global-set-key (kbd "C-c d") 'helm-dash-at-point)
    #+END_SRC
 * :package: Packages
-** Make Emacs not mess up .emacs
-   #+BEGIN_SRC emacs-lisp
-   (setq custom-file "~/.emacs.d/custom.el")
-   #+END_SRC
 ** MELPA
    #+BEGIN_SRC emacs-lisp
      (require 'package) ;; You might already have this line

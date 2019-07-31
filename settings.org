@@ -44,6 +44,10 @@
      (global-set-key (kbd "C-c d") 'helm-dash-at-point)
    #+END_SRC
 * :package: Packages
+** Make Emacs not mess up .emacs
+   #+BEGIN_SRC emacs-lisp
+   (setq custom-file "~/.emacs.d/custom.el")
+   #+END_SRC
 ** MELPA
    #+BEGIN_SRC emacs-lisp
      (require 'package) ;; You might already have this line
